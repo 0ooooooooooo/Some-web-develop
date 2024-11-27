@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        :root{
+            --bg-color: #fff;
+            background-color: var(--bg-color);
+        }
+        :root.dark{
+            --bg-color: #000;
+        }
+        /* 实际动画执行元素 */
+        ::view-transition-new(root), 
+        ::view-transition-old(root) {
+            animation: none;
+        }
+    </style>
+</head>
+<body>
+    <button id="changeBackGround">click</button>
+</body>
+</html>
+
+<script>
+    const button = document.getElementById('changeBackGround');
+    button.addEventListener('click', (e) => {
+        // 执行切换主题的动画
+        // https://developer.mozilla.org/zh-CN/docs/Web/API/Document/startViewTransition
+        const transition = document.startViewTransition(() => {
+            document.documentElement.classList.toggle('dark');
+        });
+        // 返回一个promise
+        transition.ready.then(() => {
+            // 获取坐标
+            const { clientX, clientY } = e;
+            // 返回所有参数平方和的平方根
+            // 计算最大半径 
+            const radius = Math.hypot(
+                Math.max(clientX, innerWidth - clientX),
+                Math.max(clientY, innerHeight - clientY),
+            );
+            // 开始动画
+            document.documentElement.animate(
+                {
+                    clipPath: [
+                        `circle(0% at ${clientX}px ${clientY}px)`,
+                        `circle(${radius}px at ${clientX}px ${clientY}px)`,
+                    ]
+                },
+                // 设置时间
+                // 设置目标伪元素
+                {
+                    duration: 300,
+                    pseudoElement: '::view-transition-new(root)'
+                }
+            )
+        })
+    });
+    
+</script>
